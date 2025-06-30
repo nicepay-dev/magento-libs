@@ -78,7 +78,7 @@ app/code/Nicepay/NicePayment
 
 ```json
 "require": {
-  "nicepay/nicepay-php": "^1.1"
+  "nicepay/php-nicepay": "^1.1"
 }
 ```
 
@@ -88,7 +88,7 @@ app/code/Nicepay/NicePayment
 "repositories": [
   {
     "type": "vcs",
-    "url": "https://github.com/nicepay-dev/nicepay-php"
+    "url": "https://github.com/nicepay-dev/php-nicepay"
   }
 ]
 ```
