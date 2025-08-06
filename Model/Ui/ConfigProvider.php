@@ -13,7 +13,6 @@ class ConfigProvider implements ConfigProviderInterface
 
 	private $nicepay;
 
-
 	/**
 	 * @var NicepayHelper
 	 */
@@ -22,7 +21,8 @@ class ConfigProvider implements ConfigProviderInterface
 
 	public function __construct(
 		Nicepay $nicepay,
-		NicepayHelper $nicepayHelper
+		NicepayHelper $nicepayHelper,
+
 	) {
 		$this->nicepay = $nicepay;
 		$this->nicepayHelper = $nicepayHelper;
@@ -32,6 +32,7 @@ class ConfigProvider implements ConfigProviderInterface
 
 	public function getConfig()
 	{
+
 		return [
 			'payment' => [
 				Config::CODE => [
@@ -816,10 +817,12 @@ class ConfigProvider implements ConfigProviderInterface
 
 		// Get active banks
 		$activeBanks = $this->nicepayHelper->getActiveBanks();
+
 		// If no active banks selected, return all
 		if (empty($activeBanks)) {
 			return $allBanks;
 		}
+
 		// Filter banks
 		$filteredBanks = array_intersect_key($allBanks, array_flip($activeBanks));
 		return !empty($filteredBanks) ? $filteredBanks : $allBanks;
@@ -827,7 +830,7 @@ class ConfigProvider implements ConfigProviderInterface
 
 
 
-	public static function ewalletMitraList($mitraCd = null)
+	public function ewalletMitraList($mitraCd = null)
 	{
 		$mitra = [
 			'DANA' => [
@@ -848,11 +851,19 @@ class ConfigProvider implements ConfigProviderInterface
 			]
 		];
 
-		if ($mitraCd == null) {
+
+		if ($mitraCd !== null) {
+			return $mitra[$mitraCd] ?? null;
+		}
+		$activeMitra = $this->nicepayHelper->getActiveMitra('ewallet');
+
+		if (empty($activeMitra)) {
 			return $mitra;
 		}
 
-		return $mitra[$mitraCd];
+		$filteredMitra = array_intersect_key($mitra, array_flip($activeMitra));
+
+		return !empty($filteredMitra) ? $filteredMitra : $mitra;
 	}
 
 
