@@ -43,23 +43,74 @@ Official NICEPAY payment gateway module for Magento 2. This extension enables me
 
 ## ⚙️ Installation
 
+You can install this Magento 2 module using Composer (recommended) or manually by placing the module in your Magento project.
+
+---
+
 ### Method 1: Composer Installation (Recommended)
+
+If your project uses Composer, install the module using:
 
 ```bash
 composer require nicepay/magento-libs
 ```
 
-### Method 2: Manual Installation
-
-1. Download the module from [Github](https://github.com/nicepay-dev/magento-libs)
-2. Extract into: `app/code/Nicepay/NicePayment`
-
-Then run:
+Then run the Magento setup commands:
 
 ```bash
 php bin/magento setup:upgrade
 php bin/magento setup:di:compile
 php bin/magento setup:static-content:deploy -f
+```
+
+---
+
+### Method 2: Manual Installation
+
+1. Download the module from [GitHub](https://github.com/nicepay-dev/magento-libs).
+2. Extract the contents to:
+
+```
+app/code/Nicepay/NicePayment
+```
+
+3. Add the required Nicepay PHP SDK to your Magento root `composer.json` (if not already added):
+
+```json
+"require": {
+  "nicepay/php-nicepay": "^1.1"
+}
+```
+
+4. (Optional) If the SDK is not available on Packagist, add the repository definition:
+
+```json
+"repositories": [
+  {
+    "type": "vcs",
+    "url": "https://github.com/nicepay-dev/php-nicepay"
+  }
+]
+```
+
+5. Then run the following commands:
+
+```bash
+composer update
+php bin/magento setup:upgrade
+php bin/magento setup:di:compile
+php bin/magento setup:static-content:deploy -f
+```
+
+---
+
+### Notes
+
+- For production environments, make sure to clear cache after deployment:
+
+```bash
+php bin/magento cache:clean
+php bin/magento cache:flush
 ```
 
 ---
