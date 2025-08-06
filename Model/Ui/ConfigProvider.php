@@ -152,9 +152,9 @@ class ConfigProvider implements ConfigProviderInterface
 
 		return $mitra[$mitraCd];
 	}
-	public static function bankList($bankcd = null)
+	public function bankList($bankcd = null)
 	{
-		$bank = [
+		$allBanks = [
 			'BMRI' => [
 				'label' => __('Mandiri'),
 				'content' => '<strong>ATM Mandiri</strong>
@@ -809,11 +809,20 @@ class ConfigProvider implements ConfigProviderInterface
 			],
 		];
 
-		if ($bankcd == null) {
-			return $bank;
+		// If specific bank requested
+		if ($bankcd !== null) {
+			return $allBanks[$bankcd] ?? null;
 		}
 
-		return $bank[$bankcd];
+		// Get active banks
+		$activeBanks = $this->nicepayHelper->getActiveBanks();
+		// If no active banks selected, return all
+		if (empty($activeBanks)) {
+			return $allBanks;
+		}
+		// Filter banks
+		$filteredBanks = array_intersect_key($allBanks, array_flip($activeBanks));
+		return !empty($filteredBanks) ? $filteredBanks : $allBanks;
 	}
 
 

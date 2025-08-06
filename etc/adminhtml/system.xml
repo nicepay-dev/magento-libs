@@ -89,6 +89,12 @@
                             <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                             <config_path>payment/virtual_account/client_secret</config_path>
                         </field>
+                        <field id="active_banks" translate="label" type="multiselect" sortOrder="27" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Active Banks</label>
+                            <comment>Select banks to display in customer checkout</comment>
+                            <source_model>Nicepay\NicePayment\Model\Adminhtml\Source\BankList</source_model>
+                            <config_path>payment/virtual_account/active_banks</config_path>
+                        </field>
                         <field id="use_min_amount" translate="label" sortOrder="23" type="select" showInDefault="1" showInWebsite="1" showInStore="1" >
                             <label>Use Min Amount Rule</label>
                             <comment>
