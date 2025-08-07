@@ -45,12 +45,12 @@ class ConfigProvider implements ConfigProviderInterface
 				'virtual_account' => [
 					'title' => $this->nicepayHelper->getPaymentTitle("virtual_account"),
 					'description' => $this->nicepayHelper->getPaymentDescription("virtual_account"),
-					'additionalInfo' => $this->bankList(),
+					'additionalInfo' => $this->activeBankList(),
 				],
 				'cvs' => [
 					'title' => $this->nicepayHelper->getPaymentTitle("cvs"),
 					'description' => $this->nicepayHelper->getPaymentDescription("cvs"),
-					'additionalInfo' => $this->convenienceStoreList(),
+					'additionalInfo' => $this->activeMitraList('cvs'),
 				],
 				'qris' => [
 					'title' => $this->nicepayHelper->getPaymentTitle("qris"),
@@ -59,12 +59,14 @@ class ConfigProvider implements ConfigProviderInterface
 				'ewallet' => [
 					'title' => $this->nicepayHelper->getPaymentTitle("ewallet"),
 					'description' => $this->nicepayHelper->getPaymentDescription("ewallet"),
-					'additionalInfo' => $this->ewalletMitraList(),
+					'additionalInfo' => $this->activeMitraList('ewallet'),
+
 				],
 				'payloan' => [
 					'title' => $this->nicepayHelper->getPaymentTitle("payloan"),
 					'description' => $this->nicepayHelper->getPaymentDescription("payloan"),
-					'additionalInfo' => $this->payloanMitraList(),
+					'additionalInfo' => $this->activeMitraList('payloan'),
+
 				],
 				'payout' => [
 					'title' => $this->nicepayHelper->getPaymentTitle("payout"),
@@ -80,7 +82,7 @@ class ConfigProvider implements ConfigProviderInterface
 		];
 	}
 
-	public static function convenienceStoreList($mitraCd = null)
+	public function convenienceStoreList($mitraCd = null)
 	{
 		$mitra = [
 			'ALMA' => [
@@ -123,14 +125,14 @@ class ConfigProvider implements ConfigProviderInterface
 			]
 		];
 
-		if ($mitraCd == null) {
-			return $mitra;
+		if ($mitraCd !== null) {
+			return $mitra[$mitraCd] ?? null;
 		}
 
-		return $mitra[$mitraCd];
+		return $mitra;
 	}
 
-	public static function payloanMitraList($mitraCd = null)
+	public function payloanMitraList($mitraCd = null)
 	{
 		$mitra = [
 			'AKLP' => [
@@ -147,11 +149,11 @@ class ConfigProvider implements ConfigProviderInterface
 			]
 		];
 
-		if ($mitraCd == null) {
-			return $mitra;
+		if ($mitraCd !== null) {
+			return $mitra[$mitraCd] ?? null;
 		}
 
-		return $mitra[$mitraCd];
+		return $mitra;
 	}
 	public function bankList($bankcd = null)
 	{
@@ -815,6 +817,14 @@ class ConfigProvider implements ConfigProviderInterface
 			return $allBanks[$bankcd] ?? null;
 		}
 
+		return $allBanks;
+	}
+
+	public function activeBankList()
+	{
+		// Get all banks
+		$allBanks = $this->bankList();
+
 		// Get active banks
 		$activeBanks = $this->nicepayHelper->getActiveBanks();
 
@@ -822,10 +832,27 @@ class ConfigProvider implements ConfigProviderInterface
 		if (empty($activeBanks)) {
 			return $allBanks;
 		}
-
 		// Filter banks
 		$filteredBanks = array_intersect_key($allBanks, array_flip($activeBanks));
 		return !empty($filteredBanks) ? $filteredBanks : $allBanks;
+	}
+
+	public function activeMitraList($code)
+	{
+		$activeMitra = $this->nicepayHelper->getActiveMitra($code);
+
+		$mitra = [];
+		if ($code === 'ewallet') {
+			$mitra = $this->ewalletMitraList();
+		} else if ($code === 'payloan') {
+			$mitra = $this->payloanMitraList();
+		} else if ($code === 'cvs') {
+			$mitra = $this->convenienceStoreList();
+		}
+
+		$filteredMitra = array_intersect_key($mitra, array_flip($activeMitra));
+
+		return !empty($filteredMitra) ? $filteredMitra : $mitra;
 	}
 
 
@@ -855,15 +882,8 @@ class ConfigProvider implements ConfigProviderInterface
 		if ($mitraCd !== null) {
 			return $mitra[$mitraCd] ?? null;
 		}
-		$activeMitra = $this->nicepayHelper->getActiveMitra('ewallet');
 
-		if (empty($activeMitra)) {
-			return $mitra;
-		}
-
-		$filteredMitra = array_intersect_key($mitra, array_flip($activeMitra));
-
-		return !empty($filteredMitra) ? $filteredMitra : $mitra;
+		return $mitra;
 	}
 
 
